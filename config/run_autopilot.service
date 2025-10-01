@@ -1,0 +1,10 @@
+[Unit]
+Description=LOONARR-1 Autopilot
+
+[Service]
+Type=oneshot
+User=pi
+ExecStart=/etc/systemd/system/run_autopilot.sh
+
+[Install]
+WantedBy=multi-user.target

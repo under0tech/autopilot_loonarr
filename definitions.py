@@ -1,0 +1,11 @@
+mavlink_url = '/dev/ttyACM0' # if UART use /dev/ttyAMA0
+logger_name = 'LOONARR-1'
+logger_directory = '/home/pi/Apps/loonarr/logs' # for DEV 'logs'
+vision_model = '/home/pi/Apps/loonarr/pt/yolov8n.pt' # for DEV 'pt/yolov8n.pt'
+vision_classes = [0]  # 42 - for tennis ball, 0 - person
+video_source = 255 # 0 - defult video camera, 255 - PI video camera
+camera_width = 160
+camera_height = 120
+target_lost_limit = 3
+odometry_url = '/dev/ttyUSB0'
+odometry_enabled = False
