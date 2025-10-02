@@ -1,7 +1,6 @@
 import time
 import autopilot
 import messages
-
 import commands as mavs
 import definitions as vars
 

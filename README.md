@@ -1,31 +1,31 @@
-# Autopilot for ArduRover with Target Following (Dev version)
+# Autopilot with target following for ArduRover (dev. version)
 
 ## Autopilot "LOONARR"
 The "LOONARR" autopilot, designed for installation on a companion computer mounted on *Ground Robotic Platform* (powered with ArduRover), provides basic autonomous functionality. It `enables the Car to follow the target using Computer Vision capability on the ground`. This **`"system"`** serves as a development template and is ideal for autopilot developers looking to kickstart their own projects, particularly those aimed at implementing target-following capabilities based on computer vision in **`GNSS`** and **`non-GNSS environment`**. This is not a final solution but a good start for devs.
 
 This code is largely adapted from another repository, [Autopilot with Target Following for FPV Combat Drone (Simulator version)](https://github.com/under0tech/autopilot_bee_sim), but is designed to work on real hardware, specifically a Raspberry Pi mounted on the **ArduRover** with [ArduPilot firmware](https://ardupilot.org) pre-installed. 
 
-This **`Dev Version`** has certain limitations, as features such as target selection, payload release, and anti-drone detection are not implemented. However, with the available configuration options, it can be adapted for use in both GNSS (Compass + GPS) and non-GNSS (LiDAR) environments.
+This **`dev. version`** has certain limitations, as features such as target selection, payload release, and anti-drone detection are not implemented. However, with the available configuration options, it can be adapted for use in both GNSS (Compass + GPS) and non-GNSS (LiDAR) environments.
 
 ## Environments
 As mentioned above, this autonomous platform can be configured for use in both GNSS (outdoor) and non-GNSS (indoor) environments.
 
-### GNSS Environment
+### GNSS environment
 A `GNSS (Global Navigation Satellite System) environment` is the default configuration in which the ArduRover firmware operates. It requires `GPS and compass data` to function in `GUIDED` mode, which is necessary for the autopilot to follow the target. It will not likely operate if GPS is spoofed or unavailable.
 
-### Non-GNSS Environment
+### Non-GNSS environment
 A `non-GNSS environment` is designed to work without a stable GPS signal — for example, indoors, in hangars, or even on the frontline where GPS is unavailable. It is preferable for developers to test and debug the autonomous platform in a non-GNSS environment due to the lower cost.
 
 **Note:** Choosing either option requires the developer to configure both the autopilot and Rover settings as detailed in this document.
 
 ### MODES:
-`OFF`  -  The autopilot remains inactive, awaiting operator input to switch to another mode. In this state, only telemetry monitoring and logging are active.
+`OFF`  -  autopilot remains inactive, awaiting operator input to switch to another mode. In this state, only telemetry monitoring and logging are active.
 
-`READY`  -  Initializes the autopilot to its default state. If a target was previously followed and reached, this mode resets the state and prepares the system for the next mission.
+`READY`  -  initializes the autopilot to its default state. If a target was previously followed and reached, this mode resets the state and prepares the system for the next mission.
 
-`FOLLOW`  -  Activates the basic functionality: the system attempts to detect the target (person), follow it, and disarm the vehicle once the target is reached and the mission is completed.
+`FOLLOW`  -  activates the basic functionality: the system attempts to detect the target (person), follow it, and disarm the vehicle once the target is reached and the mission is completed.
 
-## Rover Configuration
+## Rover configuration
 The *Ground Robotic Platform* used as a Car-model (Rover) in this primer is based on a `4WD chassis robot` layered on three levels:
 
 `First or lower level` - 4 × TT yellow motors with a maximum consumption of 250 mA each. For 4 motors, the cumulative consumption is 1A. 2 × BTS7960 drivers are used for the left and right sides, respectively. An XL4015 DC-DC converter steps down 24V from the battery pack to 6–8V required by the TT motors, with a current limit of 5A. A Schottky diode SS54 is included, to prevent reverse current.
@@ -69,13 +69,13 @@ B+ and B- on both drivers connect to the XL4015 converter VOUT and GND, respecti
 `Raspberry Pi 5` connects to the FC using a 6-wire JST jack on the bottom side of the FC: T5 to UART0_RXD, R5 to UART0_TXD, and GND to GND on the RPi accordingly.  
 The RPi is powered by a 5V 5A DC-DC converter connected to the battery pack via an XT60 connector.
 
-**Recommendations:**  
+**Recommendations:**
 - Assemble and test the system component-by-component. Do **not** try to build the entire device at once.  
 - Connect and verify each module sequentially: power it up, confirm correct operation, then proceed to the next part.  
 - Carefully check voltages and currents with a multimeter and compare them to each component’s specifications.  
 - Double-check polarities and connections before the first power-up. Use a current-limited power supply, fuses, or other protection when possible.
 
-## ArduPilot Configuration
+## ArduPilot configuration
 The flight controller **Dake FPV F405** must be flashed with the [ArduRover firmware](https://firmware.ardupilot.org/Rover/latest/DAKEFPVF405).  
 Once done, configure the following parameters using the [Mission Planner software](https://ardupilot.org/planner/docs/mission-planner-installation.html) accordingly:
 
@@ -115,7 +115,7 @@ Once done, configure the following parameters using the [Mission Planner softwar
 
 `WP_SPEED = 0.5` - 0.5 m/s (50 cm/s) speed limit for Rover in GUIDED mode.
 
-## Raspberry Pi Configuration
+## Raspberry Pi configuration
 The Raspberry Pi (RPi) acts as a companion computer in our setup, communicating with the ArduRover firmware on the flight controller (FC) via MavLink. 
 
 Follow the instructions below to install the autopilot code on the RPi.
@@ -130,7 +130,7 @@ Follow the instructions below to install the autopilot code on the RPi.
    ```
 4. Go to the `logs` folder, after its restart, and ensure that new files are being generated, indicating everything is working correctly. If not, check the `definitions.py` and adjust the settings as needed.
 
-## Non-GNSS Environment
+## Non-GNSS environment
 All settings described above are designed for a `GNSS environment` and will only work when your Rover has a **stable GPS signal and a healthy compass**.  
 In a `non-GNSS environment` (inside the room), you will need to make a few modifications as described in this section.
 
@@ -146,7 +146,7 @@ Required parameter changes:
 
 This setup is based on the official [ArduPilot Cartographer SLAM guide](https://ardupilot.org/dev/docs/ros-cartographer-slam.html) documentation.
 
-⚠️ Important notes:
+Important notes:
 - Your flight controller (FC) **must support** the `VISION_POSITION_ESTIMATE` MAVLink message in its firmware.  
 - The *Dake FPV* controller does **not** support it. In this case, use a board such as *Pixhawk*.  
 - Always verify that `EK3_FEATURE_EXTERNAL_NAV` is enabled in your firmware’s `features.txt` file.  
@@ -165,7 +165,7 @@ Then set the parameter `odometry_url` to the port used by the **Odometry provide
 
 For more details, see the corresponding section in [README_DEV.md](README_DEV.md).
 
-## How To Use
+## How to use
 Whether you just want to install the autopilot to observe its functionality, or run it on a real RPi, you will need to install the requirements using `requirements.txt` as shown bellow.
 
 ```bash
@@ -197,12 +197,13 @@ In a `GNSS environment`, ensure that the Rover has a *stable GPS signal and a he
 Experiment with the Rover and your *CV-based autopilot* as much as you like. 
 
 ## Customize this Autopilot
-This source code and configuration is shared to help the developer community in Ukraine get an easy start when developing autonomous systems and computer-vision-based autopilots, especially for building autonomous *Ground Robotic Platforms* with AI on board. It may be useful *as a template* for applications such as **evacuation Rovers**, **delivery Rovers**, **frontline bombers**, etc.
+This source code and configuration is shared to help the developer community in Ukraine get an easy start when developing autonomous systems and computer-vision-based autopilots, especially for building autonomous *Ground Robotic Platforms* with AI on board. It may be useful *as a template* for applications such as **evacuation rovers**, **delivery rovers**, **frontline bombers**, etc.
 
-If you are a developer (or have dev skills), you are welcome to use this code as a starting point for your own autopilot and computer-vision experiments. For detailed instructions and configuration notes, see [README_DEV.md](README_DEV.md). Share improvements and *tested builds* with others. The community will appreciate your contributions.
+If you are a developer (or have dev. skills), you are welcome to use this code as a starting point for your own autopilot and computer-vision experiments. For detailed instructions and configuration notes, see [README_DEV.md](README_DEV.md). Share improvements and *tested builds* with others. The community will appreciate your contributions.
 
 ## Troubleshooting
 Take your time during the initial setup — installing dependencies, integrating hardware components, and configuring settings can reveal many small issues because a lot of nodes are involved. Be patient, and good luck.
 
 ## Get in touch
-If you have any questions, feel free to contact me on Twitter: https://twitter.com/dmytro_sazonov
+If you have any questions, feel free to contact me on Twitter: 
+https://twitter.com/dmytro_sazonov

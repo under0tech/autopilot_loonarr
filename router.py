@@ -1,9 +1,8 @@
 import time
 import queue
-import vision
-import messages
 import autopilot
-
+import messages
+import vision
 import commands as mavs
 import definitions as vars
 

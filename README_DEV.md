@@ -1,7 +1,7 @@
-# Autopilot for ArduRover with Target Following (Guide for Developers)
+# Autopilot with target following for ArduRover (guide for developers)
 
 ## Architecture
-The Autopilot "LOONARR" uses a multi-threaded design built around a central command queue and a command router. The `Router thread` processes queued commands, while the `Telemetry thread` and `Follower thread` simply append commands to the queue. An optional `Odometry thread` is enabled in `non-GNSS environments` to support indoor navigation or operation under Electronic Warfare (EW) conditions.
+The Autopilot "LOONARR" uses a multi-threaded design built around a central command queue and a command router. The `Router thread` processes queued commands, while the `Telemetry thread` and `Follower thread` simply append commands to the queue. An optional `Odometry thread` is enabled in `non-GNSS environment` to support indoor navigation or operation under Electronic Warfare (EW) conditions.
 
 ![image](assets/rover_autopilot_architecture.png)
 
@@ -9,11 +9,11 @@ The `Telemetry thread` appends commands to the queue for system monitoring and t
 
 The `Follower thread` is responsible for detecting and tracking the target when it is within the camera’s field of view. It issues movement commands to maintain pursuit.
 
-The `Odometry thread` supplies the system with positional data in `non-GNSS environments`. It emulates sensor inputs (e.g., LiDAR) to estimate the Rover’s position and heading, enabling indoor navigation or operation under Electronic Warfare (EW) conditions.
+The `Odometry thread` supplies the system with positional data in `non-GNSS environment`. It emulates sensor inputs (e.g., LiDAR) to estimate the Rover’s position and heading, enabling indoor navigation or operation under Electronic Warfare (EW) conditions.
 
 While in operation, the Autopilot relies on several sub-modules, including computer vision with [YOLOv8 from Ultralytics](https://www.ultralytics.com) for target detection and following, [MAVLink commands](https://ardupilot.org/dev/docs/mavlink-rover-commands.html) for controlling Rover movement from RPi, and telemetry streaming to the Ground Control Station ([ArduPilot GCS](https://ardupilot.org)) for monitoring and operator feedback.
 
-## main.py and Threads
+## main.py and threads
 `main.py` is the entry point for launching the Autopilot. To execute it, follow the instructions in [README.md](README.md).  
 When started, it initializes the command queue, spawns the sub-processes (threads) described above, and issues the `INIT` command. This triggers the Autopilot initialization process, including requests for all telemetry streams from the Rover.
 
@@ -72,7 +72,7 @@ The `Autopilot settings`, as defined above, configure the resources and connecti
   - USB camera: `640x480`  
   - Raspberry Pi camera: `160x120`  
 - **`target_lost_limit`**: Maximum number of times the target can be lost during tracking before corrective actions (such as yaw adjustment) are triggered.  
-- **`odometry_url`**: Path for connecting to the MAVLink port used to transmit Lidar (RPLidar) data in non-GNSS mode.  
+- **`odometry_url`**: Path for connecting to the MAVLink port used to transmit LiDAR (RPLidar) data in non-GNSS mode.  
 - **`odometry_enabled`**: Enables non-GNSS navigation mode. Default is `False`. When set to `True`, the Autopilot transmits `VISION_POSITION_ESTIMATE` messages at 20Hz for indoor navigation.
 
 ## MAVLink commands
@@ -84,7 +84,7 @@ Communication between the companion computer (Autopilot) and the Rover is handle
 - Odometry transmission  
 - Control of the Rover’s speed, direction, and movement  
 
-The file also includes predefined scenarios for target following, target search, and Rover initialization, providing a complete framework for communication between the Autopilot and the Rover.
+The file also includes predefined scenarios for target following, target search, and Rover initialization, providing a complete list of MAVLink commands for communication between the Autopilot and the Rover.
 
 Most commands have an associated delay period, defined in the `command_delays` object. These delays ensure that the system router waits for a command to finish execution before moving on to the next one.
 
@@ -114,13 +114,13 @@ Each command method contains its own logic, sends messages to the appropriate ta
 Sensor data flows between the Flight Controller (FC) and the Autopilot in both directions:  
 
 - **Telemetry data** (e.g., battery level, speed) is sent from the FC to the Autopilot.  
-- **Odometry data** (from the Lidar sensor) is sent from the Autopilot to the FC for non-GNSS navigation.  
+- **Odometry data** (from the LiDAR sensor) is sent from the Autopilot to the FC for non-GNSS navigation.  
 
 These data streams allow both the Autopilot and the FC to monitor the current state and respond appropriately during operation.  
 
 Both processes run in parallel threads:  
 - [telemetry.py](telemetry.py) regularly requests data for monitoring (`SYS_STATUS`) and retrieves `RC_CHANNELS` values from the radio controller.  
-- [odometry.py](odometry.py) transmits `VISION_POSITION_ESTIMATE` messages from the Lidar sensor to the FC at 20Hz freq., enabling non-GNSS navigation if configured.
+- [odometry.py](odometry.py) transmits `VISION_POSITION_ESTIMATE` messages from the LiDAR sensor to the FC at 20Hz freq., enabling non-GNSS navigation if configured.
 
 ## Follower
 The [follower.py](follower.py) process manages the addition of commands to the queue for target following under specific conditions.
@@ -129,7 +129,7 @@ If the target has not yet been found and the Autopilot is in `FOLLOW` mode, it g
 
 It also resets the Autopilot state when the mode is changed to `READY`. For example, if a target was found during a previous mission, this prepares the system for the next mission by clearing the completion state back to its default. From this point, when the Rover is switched to `FOLLOW` mode again, it is ready to execute the next mission.
 
-## Computer Vision
+## Computer vision
 Computer vision is the corner stone of the target tracking process and a critical part of Autopilot functionality. It effectively acts as the "eyes" of the Autopilot, enabling the system to detect and track objects.
 
 This Autopilot uses the [YOLOv8 model](https://www.ultralytics.com) for object detection. Specifically, it employs the [yolov8n.pt](pt/yolov8n.pt) model and uses the `0 - Person` detection class.
@@ -137,9 +137,9 @@ This Autopilot uses the [YOLOv8 model](https://www.ultralytics.com) for object d
 For working with video frames, the Raspberry Pi camera, and handling different resolutions, the Autopilot also uses [OpenCV](https://opencv.org) and [Picamera2](https://www.raspberrypi.com/documentation/computers/camera_software.html#picamera2).
 
 Object detection and target following involve several complex tasks, including:
-- Converting the target's position from the image frame to Cartesian coordinates (NED - North, East, Down)
-- Adjusting the Rover’s position and speed as needed
-- Taking into account the scale and conversion factors
+- converting the target's position from the image frame to Cartesian coordinates (NED - North, East, Down)
+- adjusting the Rover’s position and speed as needed
+- taking into account the scale and conversion factors.
 
 All of this functionality is implemented within the **Computer Vision** module, located in [vision.py](vision.py) file.
 
@@ -158,20 +158,20 @@ In addition, [logger.py](logger.py) handles writing messages to log files, which
 All logs (**.log files**) and captured images (**.png files**) used for object detection and target tracking are stored in the `Logs` folder. This folder provides a complete record of the Autopilot’s operations during each mission.
 
 ## What’s next
-As mentioned earlier in the [README.md](README.md), this primer is intended to help the developer community in Ukraine get started with autonomous systems and computer-vision-based Autopilots with AI onboard. It can serve as a **template** for applications such as:
+As mentioned earlier in the [README.md](README.md), this primer is intended to help the developer community in Ukraine get started with autonomous systems and computer-vision-based autopilots with AI onboard. It can serve as a **template** for applications such as:
 
-- **Evacuation Rovers** – Autonomous vehicles designed to transport people or supplies safely from hazardous areas.
-- **Delivery Rovers** – Rovers used for delivering goods, medical supplies, or equipment to designated locations.
-- **Reconnaissance Rovers** – Vehicles equipped with sensors and cameras for gathering intelligence and surveying terrain.
-- **Demining Rovers** – Robots designed to detect and safely neutralize landmines and explosive devices.
-- **Frontline Bombers** – Autonomous systems capable of delivering payloads in combat scenarios.
-- And other autonomous variants – Any other specialized autonomous vehicles for specific tasks or missions.
+- **evacuation rovers** – autonomous vehicles designed to transport people or supplies safely from hazardous areas.
+- **delivery rovers** – rovers used for delivering goods, medical supplies, or equipment to designated locations.
+- **reconnaissance rovers** – vehicles equipped with sensors and cameras for gathering intelligence and surveying terrain.
+- **demining rovers** – robots designed to detect and safely neutralize landmines and explosive devices.
+- **frontline bombers** – autonomous systems capable of delivering payloads in combat scenarios.
+- and other autonomous variants – any other specialized autonomous vehicles for specific tasks or missions.
 
 If you have development skills, you are welcome to use this code as a starting point for your own computer vision experiments. Once you have results, share them with the community in Ukraine.
 
 ## Get in touch
 For any questions, feel free to message me on Twitter:
-[https://twitter.com/dmytro_sazonov](https://twitter.com/dmytro_sazonov)
+https://twitter.com/dmytro_sazonov
 
 
 

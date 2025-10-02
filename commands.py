@@ -1,6 +1,7 @@
 import math
 import time
 import definitions as vars
+
 from pymavlink import mavutil
 
 command_delays =  {
@@ -79,13 +80,6 @@ def follow_target(n_coord, e_coord, d_coord, yaw_angle):
         e_coord,
         0,
         1, 0, 0, 0, 0, 0, 0, 0)
-        # 0, 0, 0, 9, 3576,
-        # n_coord,
-        # e_coord,
-        # d_coord,
-        # 1, 0, 0, 0, 0, 0, yaw_angle, 0)
-    
-    # 0 0 0 1 3580 100 0 0 1 0 0 0 0 0 0 0
     master.mav.send(msg)
 
     # waiting for command to be executed

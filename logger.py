@@ -1,5 +1,6 @@
 import logging
 import definitions as vars
+
 from datetime import datetime
 
 def init_logger():

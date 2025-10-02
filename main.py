@@ -1,11 +1,10 @@
 import os
 import threading
-import messages
-import router
-import odometry
-import telemetry
 import follower
-
+import messages
+import odometry
+import router
+import telemetry
 import definitions as vars
 
 # INIT
